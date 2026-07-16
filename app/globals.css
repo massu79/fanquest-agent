@@ -1,0 +1,89 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: #030712;
+  color: #f8fafc;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-950;
+}
+
+.glass-panel {
+  @apply border border-white/10 bg-white/[0.07] shadow-panel backdrop-blur-xl;
+}
+
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(34, 211, 238, 0.8), rgba(168, 85, 247, 0.55), rgba(236, 72, 153, 0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.aurora-orbit {
+  animation: aurora-drift 16s ease-in-out infinite alternate;
+}
+
+.pulse-glow {
+  animation: pulse-glow 1.8s ease-in-out infinite;
+}
+
+.reward-pop {
+  animation: reward-pop 520ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+@keyframes aurora-drift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(4%, 3%, 0) scale(1.08); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 22px rgba(34, 211, 238, 0.35), 0 0 52px rgba(168, 85, 247, 0.18); }
+  50% { box-shadow: 0 0 36px rgba(34, 211, 238, 0.7), 0 0 92px rgba(236, 72, 153, 0.28); }
+}
+
+@keyframes reward-pop {
+  0% { opacity: 0; transform: translateY(14px) scale(.92); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.demo-step-enter { animation: demo-step-enter 360ms cubic-bezier(.2,.8,.2,1) both; }
+.count-up { animation: count-up 900ms cubic-bezier(.2,.8,.2,1) both; }
+@keyframes demo-step-enter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes count-up { from { opacity: 0; transform: translateY(10px) scale(.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .aurora-orbit, .pulse-glow, .reward-pop, .float-slow, .demo-step-enter, .count-up { animation: none; }
+}

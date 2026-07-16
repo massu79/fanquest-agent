@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+.npm-cache/
+.playwright-cli/
+.env*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
