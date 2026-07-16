@@ -26,3 +26,15 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+      - name: Verify live submission surface
+        run: |
+          npm run start > /tmp/fanquest.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid' EXIT
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:3000/demo > /dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          npm run verify:submission

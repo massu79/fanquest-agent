@@ -6,7 +6,8 @@
                     "dev":  "next dev --webpack",
                     "build":  "next build",
                     "lint":  "eslint .",
-                    "verify:testnet-claim":  "node scripts/verify-testnet-claim.mjs"
+                    "verify:testnet-claim":  "node scripts/verify-testnet-claim.mjs",
+                    "verify:submission":     "node scripts/verify-submission.mjs"
                 },
     "dependencies":  {
                          "es-abstract":  "^1.24.2",

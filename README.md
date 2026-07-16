@@ -148,6 +148,17 @@ npm run lint
 npm run build
 ```
 
+Runtime submission gate:
+
+```powershell
+npm.cmd run verify:submission
+$env:FANQUEST_BASE_URL="https://your-deployment.example"
+npm.cmd run verify:submission
+Remove-Item Env:FANQUEST_BASE_URL
+```
+
+The gate requires all four product routes to return their expected content, a live World Cup feed with at least two matches, and a live `injective-888` block height.
+
 Ephemeral proof utility:
 
 ```powershell
