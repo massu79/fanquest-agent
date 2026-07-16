@@ -25,10 +25,10 @@
 
 ## P0 - Submission Assets
 
-- [ ] Desktop screenshot: live World Cup match selection
-- [ ] Desktop screenshot: reward reveal
+- [x] Desktop screenshot: live World Cup match selection
+- [x] Desktop screenshot: reward reveal
 - [ ] Desktop screenshot: confirmed Claim receipt and Explorer link
-- [ ] Mobile screenshot: final Share screen
+- [x] Mobile screenshot: final Share screen
 - [ ] 60-90 second demo video covering the complete loop
 - [ ] X post with `@injective`, `@NinjaLabsHQ`, `@NinjaLabsCN`, and `#InjectiveGlobalCupHackathon`
 

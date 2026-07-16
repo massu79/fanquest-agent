@@ -23,6 +23,24 @@ Open `/demo` and complete the 12-step journey in under two minutes:
 11. Inspect the transaction hash, block, gas, and Blockscout link; review the payout boundary.
 12. Generate and copy a share-ready X post.
 
+## Demo Screenshots
+
+Live match selection with source and update time:
+
+![Live World Cup match selection](docs/screenshots/01-live-match-selection.png)
+
+The reward reveal is the emotional peak of the journey:
+
+![FanQuest reward reveal](docs/screenshots/02-reward-reveal.png)
+
+Review mode completes the story while clearly showing that no transaction was sent:
+
+![Final share screen in Review mode](docs/screenshots/03-final-share-review.png)
+
+The full journey is responsive on a 390 px mobile viewport:
+
+![Mobile final share screen](docs/screenshots/04-final-share-mobile.png)
+
 ## What Is Live
 
 | Capability | Status | Evidence |
@@ -154,7 +172,7 @@ The remaining external submission gates are:
 
 - set the real public demo and GitHub URLs;
 - run one user-approved Claim transaction from a funded MetaMask testnet account;
-- capture final screenshots and a short demo video;
+- capture a confirmed Explorer receipt screenshot and a short demo video;
 - deploy a funded reward contract only if actual `0.75 INJ` payout is required beyond the receipt proof.
 
 See `docs/SUBMISSION_CHECKLIST.md` for the exact July 19 sequence.
