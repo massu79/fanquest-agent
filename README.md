@@ -112,6 +112,7 @@ The in-app browser and some judge environments do not expose MetaMask. When no i
 - `docs/AGENT_SKILL.md` - agent workflow
 - `docs/PRODUCT_REVIEW.md` - internal product review
 - `docs/SUBMISSION_CHECKLIST.md` - July 19 submission gate
+- docs/DEMO_SCRIPT.md - 90-second judge narration and recording sequence
 
 ## Local Development
 
