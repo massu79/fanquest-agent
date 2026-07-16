@@ -1,5 +1,7 @@
 # FanQuest Agent
 
+[![FanQuest quality gate](https://github.com/massu79/fanquest-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/massu79/fanquest-agent/actions/workflows/ci.yml)
+
 FanQuest Agent turns a World Cup match into a guided fan loop:
 
 **Predict -> Compete -> Reveal -> Rank -> Claim -> Share**
