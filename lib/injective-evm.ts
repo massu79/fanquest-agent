@@ -9,6 +9,8 @@ export const INJECTIVE_EVM_TESTNET = {
 
 export type Eip1193Provider = {
   request<T = unknown>(args: { method: string; params?: unknown[] | Record<string, unknown> }): Promise<T>;
+  isMetaMask?: boolean;
+  providers?: Eip1193Provider[];
 };
 
 export type WalletSnapshot = {
@@ -34,7 +36,25 @@ type TransactionReceipt = {
 
 export function getInjectedProvider(): Eip1193Provider | null {
   if (typeof window === "undefined") return null;
-  return (window as unknown as { ethereum?: Eip1193Provider }).ethereum ?? null;
+  const injected = (window as unknown as { ethereum?: Eip1193Provider }).ethereum;
+  if (!injected) return null;
+  return injected.providers?.find((candidate) => candidate.isMetaMask) ?? injected;
+}
+
+function walletErrorCode(error: unknown) {
+  if (!error || typeof error !== "object") return undefined;
+  const candidate = error as { code?: number | string; data?: { originalError?: { code?: number | string } } };
+  return Number(candidate.code ?? candidate.data?.originalError?.code);
+}
+
+export function describeWalletError(error: unknown) {
+  const code = walletErrorCode(error);
+  if (code === 4001) return "Connection cancelled in MetaMask. Open MetaMask and approve the account and network requests, then retry.";
+  if (code === -32002) return "A MetaMask request is already waiting. Open the MetaMask extension, complete or reject the pending request, then retry.";
+  if (code === 4902) return "Injective EVM Testnet could not be added. Add chain ID 1439 in MetaMask, then retry.";
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === "object" && "message" in error && typeof error.message === "string") return error.message;
+  return "Wallet connection failed. Open MetaMask, unlock it, and retry.";
 }
 
 async function switchToInjective(provider: Eip1193Provider) {
@@ -44,7 +64,7 @@ async function switchToInjective(provider: Eip1193Provider) {
       params: [{ chainId: INJECTIVE_EVM_TESTNET.chainId }]
     });
   } catch (error) {
-    const code = (error as { code?: number }).code;
+    const code = walletErrorCode(error);
     if (code !== 4902) throw error;
     await provider.request({
       method: "wallet_addEthereumChain",

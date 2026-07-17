@@ -8,7 +8,7 @@ import { HypeBadge } from "./HypeBadge";
 import { RewardCard } from "./RewardCard";
 import { calculatePoints, demoSubmissions, generateQuests, type FanSubmission } from "@/lib/quests";
 import { mockMatches, type WorldCupFeed, type WorldCupMatch } from "@/lib/worldcup-data";
-import { connectInjectiveWallet, INJECTIVE_EVM_TESTNET, readWallet, submitClaimReceipt, type ClaimReceipt, type Eip1193Provider } from "@/lib/injective-evm";
+import { connectInjectiveWallet, describeWalletError, getInjectedProvider, INJECTIVE_EVM_TESTNET, readWallet, submitClaimReceipt, type ClaimReceipt, type Eip1193Provider } from "@/lib/injective-evm";
 
 const stepLabels = ["Account", "Wallet", "Faucet", "Match", "Quest", "Predict", "Result", "Reveal", "Rank", "Claim", "Withdraw", "Share"];
 const reviewWalletAddress = "0xFaa0000000000000000000000000000000002026";
@@ -52,6 +52,7 @@ export function DemoScript() {
   const [walletBalance, setWalletBalance] = useState("0.0000");
   const [walletBusy, setWalletBusy] = useState(false);
   const [walletMessage, setWalletMessage] = useState("");
+  const [walletDetected, setWalletDetected] = useState<boolean | null>(null);
   const [claimState, setClaimState] = useState<"idle" | "signing" | "confirming" | "confirmed" | "failed">("idle");
   const [claimError, setClaimError] = useState("");
   const [claimReceipt, setClaimReceipt] = useState<ClaimReceipt | null>(null);
@@ -97,6 +98,17 @@ export function DemoScript() {
       .catch(() => undefined);
   }, []);
 
+  useEffect(() => {
+    const detectWallet = () => setWalletDetected(Boolean(getInjectedProvider()));
+    detectWallet();
+    const timer = window.setTimeout(detectWallet, 750);
+    window.addEventListener("ethereum#initialized", detectWallet, { once: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("ethereum#initialized", detectWallet);
+    };
+  }, []);
+
   async function connectWallet() {
     setWalletBusy(true);
     setWalletMessage("");
@@ -106,22 +118,28 @@ export function DemoScript() {
       setWalletAddress(connected.wallet.address);
       setWalletBalance(connected.wallet.balanceInj);
       setWalletMode("live");
+      setWalletDetected(true);
       setWalletMessage("MetaMask connected to Injective EVM Testnet.");
       setStep(2);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Wallet connection failed";
-      if (message === "NO_INJECTED_WALLET") {
-        setWalletMode("review");
-        setWalletAddress(reviewWalletAddress);
-        setWalletBalance("0.0000");
-        setWalletMessage("No injected wallet detected. Review mode keeps the guided demo moving; live Claim will be labeled simulated.");
-        setStep(2);
+      if (error instanceof Error && error.message === "NO_INJECTED_WALLET") {
+        setWalletDetected(false);
+        setWalletMessage("MetaMask is not available in this browser. Open the demo in Chrome or Brave with MetaMask installed and unlocked for a live Claim.");
       } else {
-        setWalletMessage(message);
+        setWalletDetected(true);
+        setWalletMessage(describeWalletError(error));
       }
     } finally {
       setWalletBusy(false);
     }
+  }
+
+  function continueInReviewMode() {
+    setWalletMode("review");
+    setWalletAddress(reviewWalletAddress);
+    setWalletBalance("0.0000");
+    setWalletMessage("Review mode selected. No wallet signature or live transaction will be requested.");
+    setStep(2);
   }
 
   async function checkBalanceAndContinue() {
@@ -226,9 +244,10 @@ export function DemoScript() {
       </DemoPanel>}
 
       {step === 1 && <DemoPanel eyebrow="Step 2 / Connect Wallet" title={`Welcome, ${displayName}`} description="Connect MetaMask to Injective EVM Testnet. The app never sees or stores your private key.">
-        <WalletCard balance={`${walletBalance} INJ`} status={walletMode === "live" ? "Live wallet connected" : "Ready to connect"} address={walletAddress} />
-        {walletMessage && <StatusNote tone={walletMode === "live" ? "success" : "neutral"}>{walletMessage}</StatusNote>}
-        <PrimaryAction disabled={walletBusy} onClick={connectWallet}>{walletBusy ? "Connecting..." : "Connect MetaMask"}</PrimaryAction>
+        <WalletCard balance={`${walletBalance} INJ`} status={walletMode === "live" ? "Live wallet connected" : walletDetected === false ? "MetaMask not detected" : "Ready to connect"} address={walletAddress} statusTone={walletMode === "live" ? "success" : walletDetected === false ? "warning" : "neutral"} />
+        {walletMessage && <StatusNote tone={walletMode === "live" ? "success" : walletDetected === false ? "error" : "neutral"}>{walletMessage}</StatusNote>}
+        {walletDetected === false && <div className="mx-auto mt-4 max-w-2xl rounded-lg border border-cyan-300/20 bg-cyan-300/10 p-4"><p className="font-black text-white">Live wallet requires a MetaMask-enabled browser</p><p className="mt-1 text-sm text-slate-300">Desktop: open this same demo URL in Chrome or Brave and unlock MetaMask. The Codex in-app browser cannot expose browser extensions.</p><a className="focus-ring mt-3 inline-flex rounded border border-cyan-200/30 px-3 py-2 text-sm font-black text-cyan-100 hover:bg-cyan-200/10" href="https://metamask.io/download/" target="_blank" rel="noreferrer">MetaMask browser setup</a></div>}
+        <div className="mt-7 flex flex-col items-end gap-3 sm:flex-row sm:justify-end"><GlowButton disabled={walletBusy} onClick={connectWallet}>{walletBusy ? "Connecting..." : walletDetected === false ? "Retry MetaMask Detection" : "Connect MetaMask"}</GlowButton>{walletDetected === false && <GlowButton type="button" tone="secondary" onClick={continueInReviewMode}>Continue in Review Mode</GlowButton>}</div>
       </DemoPanel>}
       {step === 2 && <DemoPanel eyebrow="Step 3 / Testnet Faucet" title="Verify INJ for testnet gas" description="Your live wallet balance is read from Injective EVM Testnet. Review mode uses clearly labeled deterministic funds.">
         <WalletCard balance={`${walletBalance} INJ`} status={walletMode === "live" ? "Injective EVM Testnet" : "Review mode"} address={walletAddress} />
@@ -293,9 +312,10 @@ function DemoPanel({ eyebrow, title, description, children }: { eyebrow: string;
   return <section className="gradient-border relative rounded-lg bg-white/[0.06] p-5 shadow-panel sm:p-7"><div className="mb-6"><HypeBadge>{eyebrow}</HypeBadge><h2 className="mt-4 text-3xl font-black text-white sm:text-4xl">{title}</h2><p className="mt-2 max-w-2xl text-slate-300">{description}</p></div>{children}</section>;
 }
 
-function WalletCard({ balance, status, address }: { balance: string; status: string; address: string }) {
+function WalletCard({ balance, status, address, statusTone = "success" }: { balance: string; status: string; address: string; statusTone?: "success" | "warning" | "neutral" }) {
   const amount = balance.replace(" INJ", "");
-  return <div className="mx-auto max-w-2xl rounded-lg border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 to-fuchsia-400/10 p-5"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-wide text-cyan-200">Injective Testnet Wallet</p><p className="mt-2 break-all text-sm text-slate-300">{address}</p></div><span className="rounded bg-emerald-300/10 px-2 py-1 text-xs font-black text-emerald-200">{status}</span></div><div className="mt-5 rounded-lg border border-white/10 bg-black/25 p-4"><div className="flex items-center gap-3"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-cyan-300 to-fuchsia-500 text-sm font-black text-white">INJ</span><div className="min-w-0 flex-1"><p className="font-black text-white">Injective</p><p className="text-xs text-slate-400">Native token / Injective Testnet</p></div><div className="text-right"><p className="text-2xl font-black text-white">{amount}</p><p className="text-xs font-bold text-cyan-200">INJ available</p></div></div></div><div className="mt-3 flex items-center justify-between text-xs"><span className="text-slate-500">Portfolio balance</span><span className="font-bold text-slate-300">{balance}</span></div><p className="mt-2 text-xs text-slate-500">Testnet or review funds only. No real-world value.</p></div>;
+  const statusStyle = statusTone === "success" ? "bg-emerald-300/10 text-emerald-200" : statusTone === "warning" ? "bg-rose-300/10 text-rose-200" : "bg-white/10 text-slate-300";
+  return <div className="mx-auto max-w-2xl rounded-lg border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 to-fuchsia-400/10 p-5"><div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-wide text-cyan-200">Injective Testnet Wallet</p><p className="mt-2 break-all text-sm text-slate-300">{address}</p></div><span className={`rounded px-2 py-1 text-xs font-black ${statusStyle}`}>{status}</span></div><div className="mt-5 rounded-lg border border-white/10 bg-black/25 p-4"><div className="flex items-center gap-3"><span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-cyan-300 to-fuchsia-500 text-sm font-black text-white">INJ</span><div className="min-w-0 flex-1"><p className="font-black text-white">Injective</p><p className="text-xs text-slate-400">Native token / Injective Testnet</p></div><div className="text-right"><p className="text-2xl font-black text-white">{amount}</p><p className="text-xs font-bold text-cyan-200">INJ available</p></div></div></div><div className="mt-3 flex items-center justify-between text-xs"><span className="text-slate-500">Portfolio balance</span><span className="font-bold text-slate-300">{balance}</span></div><p className="mt-2 text-xs text-slate-500">Testnet or review funds only. No real-world value.</p></div>;
 }
 function StatusNote({ tone, children }: { tone: "success" | "neutral" | "error"; children: ReactNode }) {
   const styles = tone === "success" ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-100" : tone === "error" ? "border-rose-300/20 bg-rose-300/10 text-rose-100" : "border-white/10 bg-white/[0.04] text-slate-300";
