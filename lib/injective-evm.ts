@@ -13,6 +13,11 @@ export type Eip1193Provider = {
   providers?: Eip1193Provider[];
 };
 
+type Eip6963ProviderDetail = {
+  info: { name: string; rdns: string };
+  provider: Eip1193Provider;
+};
+
 export type WalletSnapshot = {
   address: string;
   balanceInj: string;
@@ -39,6 +44,31 @@ export function getInjectedProvider(): Eip1193Provider | null {
   const injected = (window as unknown as { ethereum?: Eip1193Provider }).ethereum;
   if (!injected) return null;
   return injected.providers?.find((candidate) => candidate.isMetaMask) ?? injected;
+}
+
+export async function discoverInjectedProvider(timeoutMilliseconds = 800): Promise<Eip1193Provider | null> {
+  if (typeof window === "undefined") return null;
+  const legacyProvider = getInjectedProvider();
+  if (legacyProvider?.isMetaMask) return legacyProvider;
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (provider: Eip1193Provider | null) => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener("eip6963:announceProvider", handleAnnouncement as EventListener);
+      window.clearTimeout(timer);
+      resolve(provider);
+    };
+    const handleAnnouncement = (event: Event) => {
+      const detail = (event as CustomEvent<Eip6963ProviderDetail>).detail;
+      const isMetaMask = detail?.info?.rdns === "io.metamask" || detail?.info?.name === "MetaMask" || detail?.provider?.isMetaMask;
+      if (isMetaMask) finish(detail.provider);
+    };
+    const timer = window.setTimeout(() => finish(legacyProvider), timeoutMilliseconds);
+    window.addEventListener("eip6963:announceProvider", handleAnnouncement as EventListener);
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+  });
 }
 
 function walletErrorCode(error: unknown) {
@@ -96,7 +126,7 @@ export async function readWallet(provider: Eip1193Provider, address: string): Pr
 }
 
 export async function connectInjectiveWallet(): Promise<{ provider: Eip1193Provider; wallet: WalletSnapshot }> {
-  const provider = getInjectedProvider();
+  const provider = await discoverInjectedProvider();
   if (!provider) throw new Error("NO_INJECTED_WALLET");
   const accounts = await provider.request<string[]>({ method: "eth_requestAccounts" });
   const address = accounts[0];

@@ -8,7 +8,7 @@ import { HypeBadge } from "./HypeBadge";
 import { RewardCard } from "./RewardCard";
 import { calculatePoints, demoSubmissions, generateQuests, type FanSubmission } from "@/lib/quests";
 import { mockMatches, type WorldCupFeed, type WorldCupMatch } from "@/lib/worldcup-data";
-import { connectInjectiveWallet, describeWalletError, getInjectedProvider, INJECTIVE_EVM_TESTNET, readWallet, submitClaimReceipt, type ClaimReceipt, type Eip1193Provider } from "@/lib/injective-evm";
+import { connectInjectiveWallet, describeWalletError, discoverInjectedProvider, INJECTIVE_EVM_TESTNET, readWallet, submitClaimReceipt, type ClaimReceipt, type Eip1193Provider } from "@/lib/injective-evm";
 
 const stepLabels = ["Account", "Wallet", "Faucet", "Match", "Quest", "Predict", "Result", "Reveal", "Rank", "Claim", "Withdraw", "Share"];
 const reviewWalletAddress = "0xFaa0000000000000000000000000000000002026";
@@ -99,12 +99,15 @@ export function DemoScript() {
   }, []);
 
   useEffect(() => {
-    const detectWallet = () => setWalletDetected(Boolean(getInjectedProvider()));
-    detectWallet();
-    const timer = window.setTimeout(detectWallet, 750);
+    let active = true;
+    const detectWallet = async () => {
+      const detected = Boolean(await discoverInjectedProvider());
+      if (active) setWalletDetected(detected);
+    };
+    void detectWallet();
     window.addEventListener("ethereum#initialized", detectWallet, { once: true });
     return () => {
-      window.clearTimeout(timer);
+      active = false;
       window.removeEventListener("ethereum#initialized", detectWallet);
     };
   }, []);
