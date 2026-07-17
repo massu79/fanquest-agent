@@ -167,7 +167,7 @@ export function DashboardClient({ matches }: DashboardClientProps) {
           </section>
 
           <InjectiveTechPanel unlocked={unlocked} onUnlock={() => setUnlocked(true)} />
-          <XShareCard match={selectedMatch} entries={entries} />
+          <XShareCard entries={entries} />
         </div>
 
         <aside className="space-y-6">

@@ -26,13 +26,10 @@ function pickDemoMatches(matches: WorldCupMatch[]) {
   return [...finished, ...remaining].slice(0, 3);
 }
 
-function buildDemoXPost(match: WorldCupMatch, fan: string, points: number, badge: string, receipt: ClaimReceipt | null) {
+function buildDemoXPost(points: number) {
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL ?? "https://fanquest-agent.vercel.app/demo";
   const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/massu79/fanquest-agent";
-  const claimLine = receipt
-    ? `recorded a live Injective Testnet claim receipt (${receipt.transactionHash.slice(0, 10)}...)`
-    : "unlocked a 0.75 test INJ demo reward";
-  return `FanQuest Agent turns the World Cup fan engagement problem into a shared onchain moment.\n\nI completed ${match.homeTeam} vs ${match.awayTeam}, revealed "${badge}", ${claimLine}, and earned ${points} points as ${fan}.\n\nPredict -> Compete -> Reveal -> Rank -> Claim -> Share, powered by Injective.\n\nBuilt with live World Cup results, ${receipt ? "a confirmed Injective Testnet receipt" : "live Injective network reads and a receipt-ready MetaMask flow"}, x402/CCTP/MCP prototypes, and an Agent Skills workflow.\n\nDemo: ${demoUrl}\nGitHub: ${githubUrl}\n\n@injective @NinjaLabsHQ @NinjaLabsCN\n#InjectiveGlobalCupHackathon`;
+  return `FanQuest Agent makes World Cup fans play: predict, compete, reveal, rank & share.\n\nQuest complete: ${points} pts + reward revealed on Injective Testnet.\n\nDemo: ${demoUrl}\nCode: ${githubUrl}\n@injective @NinjaLabsHQ @NinjaLabsCN\n#InjectiveGlobalCupHackathon`;
 }
 
 export function DemoScript() {
@@ -66,7 +63,7 @@ export function DemoScript() {
   const leaderboard = [...otherFans, currentFan].sort((a, b) => b.points - a.points || a.displayName.localeCompare(b.displayName));
   const rank = leaderboard.findIndex((fan) => fan.id === currentFan.id) + 1;
   const badge = currentFan.points >= 70 ? "Underdog Oracle" : currentFan.points >= 50 ? "Matchday Mystic" : "Quest Contender";
-  const xPost = buildDemoXPost(match, currentFan.displayName, currentFan.points, badge, claimReceipt);
+  const xPost = buildDemoXPost(currentFan.points);
   const quests = generateQuests(match).slice(0, 4);
   useEffect(() => {
     if (step !== 6) return;
