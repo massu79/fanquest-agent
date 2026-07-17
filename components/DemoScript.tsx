@@ -27,7 +27,7 @@ function pickDemoMatches(matches: WorldCupMatch[]) {
 }
 
 function buildDemoXPost(match: WorldCupMatch, fan: string, points: number, badge: string, receipt: ClaimReceipt | null) {
-  const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL ?? "https://fanquest-agent.example/demo";
+  const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL ?? "https://fanquest-agent.vercel.app/demo";
   const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/massu79/fanquest-agent";
   const claimLine = receipt
     ? `recorded a live Injective Testnet claim receipt (${receipt.transactionHash.slice(0, 10)}...)`

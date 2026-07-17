@@ -17,11 +17,11 @@
 ## P0 - Publish
 
 - [x] Create or confirm the public GitHub repository
-- [ ] Deploy the Next.js app
-- [ ] Set `NEXT_PUBLIC_DEMO_URL`
+- [x] Deploy the Next.js app: https://fanquest-agent.vercel.app
+- [x] Set `NEXT_PUBLIC_DEMO_URL`
 - [x] Set `NEXT_PUBLIC_GITHUB_URL`
-- [ ] Rebuild and verify the X post contains both real links
-- [ ] Verify `/`, `/dashboard`, `/demo`, `/docs`, and both API routes in production
+- [x] Rebuild and verify the X post contains both real links
+- [x] Verify `/`, `/dashboard`, `/demo`, `/docs`, and both API routes in production
 
 ## P0 - Submission Assets
 

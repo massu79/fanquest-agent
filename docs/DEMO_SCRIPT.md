@@ -32,6 +32,6 @@
 
 Add these three links in the final frame:
 
-- Demo: `NEXT_PUBLIC_DEMO_URL`
-- GitHub: `NEXT_PUBLIC_GITHUB_URL`
+- Demo: https://fanquest-agent.vercel.app/demo
+- GitHub: https://github.com/massu79/fanquest-agent
 - Injective Blockscout: confirmed Claim transaction URL

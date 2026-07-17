@@ -2,6 +2,8 @@
 
 [![FanQuest quality gate](https://github.com/massu79/fanquest-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/massu79/fanquest-agent/actions/workflows/ci.yml)
 
+**Live demo:** https://fanquest-agent.vercel.app/demo
+
 FanQuest Agent turns a World Cup match into a guided fan loop:
 
 **Predict -> Compete -> Reveal -> Rank -> Claim -> Share**
@@ -152,7 +154,7 @@ Runtime submission gate:
 
 ```powershell
 npm.cmd run verify:submission
-$env:FANQUEST_BASE_URL="https://your-deployment.example"
+$env:FANQUEST_BASE_URL="https://fanquest-agent.vercel.app"
 npm.cmd run verify:submission
 Remove-Item Env:FANQUEST_BASE_URL
 ```
