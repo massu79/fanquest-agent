@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { bech32 } from "@scure/base";
 import {
   createPublicClient,
@@ -60,6 +60,15 @@ log(`Open ${faucetUrl} and fund the mapped Injective address shown above.`);
 log("Complete the faucet captcha manually. This process will keep the ephemeral key in memory while it waits.");
 const startedAt = new Date();
 const deadline = Date.now() + timeoutMinutes * 60_000;
+await saveEvidence("injective-testnet-faucet-pending.json", {
+  status: "awaiting-faucet",
+  chainId,
+  evmAddress: account.address,
+  injectiveAddress,
+  requestedAt: startedAt.toISOString(),
+  timeoutMinutes,
+  note: "No secret is stored; this address can only be used while the verification process is running."
+});
 let balance = 0n;
 while (Date.now() < deadline) {
   balance = await publicClient.getBalance({ address: account.address });
@@ -113,6 +122,7 @@ const evidence = {
   claimSemantics: "Real zero-value testnet claim receipt. The displayed 0.75 INJ remains demo reward accounting."
 };
 await saveEvidence("injective-testnet-claim.json", evidence);
+await unlink("docs/evidence/injective-testnet-faucet-pending.json").catch(() => undefined);
 log(`Confirmed in block ${evidence.blockNumber}`);
 log(`Explorer: ${evidence.explorerUrl}`);
 }
