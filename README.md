@@ -45,6 +45,10 @@ The full journey is responsive on a 390 px mobile viewport:
 
 ![Mobile final share screen](docs/screenshots/04-final-share-mobile.png)
 
+The confirmed Injective Testnet Claim is independently verifiable on Blockscout:
+
+![Confirmed Injective Testnet Claim](docs/screenshots/05-confirmed-claim-blockscout.png)
+
 ## What Is Live
 
 | Capability | Status | Evidence |
@@ -88,6 +92,15 @@ The browser integration is implemented in `lib/injective-evm.ts` without storing
 - Faucet: `https://testnet.faucet.injective.network/`
 
 The Claim step sends a user-signed, zero-value transaction from the connected address back to itself with a UTF-8 FanQuest claim memo in `data`. It is an actual testnet transaction and produces an Explorer-verifiable receipt. It does **not** transfer the displayed `0.75 INJ` reward.
+
+Confirmed submission proof (July 17, 2026):
+
+- Transaction: [`0xb82ac9e0...1059492`](https://testnet.blockscout.injective.network/tx/0xb82ac9e0c9b9631e82afc367704364410a5bed8b15b76deb9f73c5c711059492)
+- Block: `133790316`
+- Status: `success`
+- Gas used: `21848`
+- Memo: `FanQuest|claim|submission-proof|Aiko|65|0.75-demo-INJ`
+- Public evidence: `docs/evidence/injective-testnet-claim.json`
 
 The reward amount and Withdraw step remain deterministic demo accounting until a funded reward contract or treasury is deployed. The UI states this boundary explicitly.
 
@@ -186,9 +199,8 @@ The product journey, live World Cup feed, live Injective chain read, MetaMask in
 
 The remaining external submission gates are:
 
-- set the real public demo URL;
-- run one user-approved Claim transaction from a funded MetaMask testnet account;
-- capture a confirmed Explorer receipt screenshot and a short demo video;
+- record a 60-90 second demo video;
+- publish the generated X post with the required accounts and hashtag;
 - deploy a funded reward contract only if actual `0.75 INJ` payout is required beyond the receipt proof.
 
 See `docs/SUBMISSION_CHECKLIST.md` for the exact July 19 sequence.

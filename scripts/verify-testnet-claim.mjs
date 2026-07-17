@@ -7,12 +7,14 @@ import {
   formatEther,
   hexToBytes,
   http,
+  keccak256,
   stringToHex
 } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 const rpcUrl = "https://k8s.testnet.json-rpc.injective.network/";
 const explorerUrl = "https://testnet.blockscout.injective.network";
+const explorerApiUrl = "https://testnet.blockscout-api.injective.network/api/v2";
 const faucetUrl = "https://testnet.faucet.injective.network/";
 const pollIntervalMs = 15_000;
 const timeoutMinutes = Number(process.env.FANQUEST_FAUCET_TIMEOUT_MINUTES ?? 15);
@@ -91,16 +93,61 @@ if (balance === 0n) {
 }
 
 const memo = "FanQuest|claim|submission-proof|Aiko|65|0.75-demo-INJ";
-const transactionHash = await walletClient.sendTransaction({
+const claimRequest = await walletClient.prepareTransactionRequest({
   account,
   to: account.address,
   value: 0n,
   data: stringToHex(memo)
 });
-log(`Claim submitted: ${transactionHash}`);
-
-const receipt = await publicClient.waitForTransactionReceipt({ hash: transactionHash, timeout: 90_000 });
-const transaction = await publicClient.getTransaction({ hash: transactionHash });
+const serializedTransaction = await walletClient.signTransaction(claimRequest);
+const transactionHash = keccak256(serializedTransaction);
+const receiptDeadline = Date.now() + 5 * 60_000;
+let receipt;
+let broadcastAttempts = 0;
+let receiptPollAttempts = 0;
+let evidenceSource = "Injective JSON-RPC";
+let confirmationsAtEvidence = null;
+let confirmedAt;
+while (!receipt && Date.now() < receiptDeadline) {
+  receiptPollAttempts += 1;
+  if (receiptPollAttempts === 1 || receiptPollAttempts % 6 === 0) {
+    broadcastAttempts += 1;
+    try {
+      await walletClient.sendRawTransaction({ serializedTransaction });
+      log(`Claim broadcast ${broadcastAttempts}: ${transactionHash}`);
+    } catch {
+      log(`Broadcast ${broadcastAttempts} was not accepted yet; retrying the same signed transaction.`);
+    }
+  }
+  try {
+    receipt = await publicClient.getTransactionReceipt({ hash: transactionHash });
+  } catch {
+    await delay(5000);
+  }
+}
+if (!receipt) {
+  const explorerResponse = await fetch(`${explorerApiUrl}/transactions/${transactionHash}`, {
+    signal: AbortSignal.timeout(15_000)
+  });
+  if (explorerResponse.ok) {
+    const explorerTransaction = await explorerResponse.json();
+    if (explorerTransaction.status === "ok" && explorerTransaction.block_number) {
+      receipt = {
+        status: "success",
+        blockNumber: BigInt(explorerTransaction.block_number),
+        gasUsed: BigInt(explorerTransaction.gas_used),
+        from: explorerTransaction.from.hash,
+        to: explorerTransaction.to.hash
+      };
+      evidenceSource = "Injective Blockscout API v2";
+      confirmationsAtEvidence = explorerTransaction.confirmations;
+      confirmedAt = explorerTransaction.timestamp;
+    }
+  }
+}
+if (!receipt) {
+  throw new Error(`Claim was not confirmed after ${broadcastAttempts} rebroadcast attempts: ${transactionHash}`);
+}
 const evidence = {
   status: receipt.status,
   chainId,
@@ -114,10 +161,14 @@ const evidence = {
   gasUsed: receipt.gasUsed.toString(),
   from: receipt.from,
   to: receipt.to,
-  valueWei: transaction.value.toString(),
+  valueWei: claimRequest.value.toString(),
   memo,
+  broadcastAttempts,
+  receiptPollAttempts,
+  evidenceSource,
+  confirmationsAtEvidence,
   fundingWaitStartedAt: startedAt.toISOString(),
-  confirmedAt: new Date().toISOString(),
+  confirmedAt: confirmedAt ?? new Date().toISOString(),
   keyHandling: "Ephemeral verification key generated in process memory; never printed or persisted.",
   claimSemantics: "Real zero-value testnet claim receipt. The displayed 0.75 INJ remains demo reward accounting."
 };

@@ -11,8 +11,8 @@
 - [x] User-signed Claim receipt implementation
 - [x] Receipt confirmation, block, gas, and Blockscout link
 - [x] No-extension Review mode with no fake transaction hash
-- [ ] Submit one live Claim receipt from a funded MetaMask account
-- [ ] Record the confirmed Blockscout URL in submission materials
+- [x] Submit one live Claim receipt from a funded testnet account
+- [x] Record the confirmed Blockscout URL in submission materials
 
 ## P0 - Publish
 
@@ -27,7 +27,7 @@
 
 - [x] Desktop screenshot: live World Cup match selection
 - [x] Desktop screenshot: reward reveal
-- [ ] Desktop screenshot: confirmed Claim receipt and Explorer link
+- [x] Desktop screenshot: confirmed Claim receipt and Explorer link
 - [x] Mobile screenshot: final Share screen
 - [ ] 60-90 second demo video covering the complete loop
 - [ ] X post with `@injective`, `@NinjaLabsHQ`, `@NinjaLabsCN`, and `#InjectiveGlobalCupHackathon`
@@ -39,7 +39,7 @@
 - [x] x402, CCTP, and MCP are not presented as completed integrations
 - [x] README explains the actual Injective transaction boundary
 - [x] No secrets or private keys in the repository
-- [ ] Add the real confirmed tx hash to README after the wallet run
+- [x] Add the real confirmed tx hash to README after the wallet run
 
 ## Optional Stretch
 
