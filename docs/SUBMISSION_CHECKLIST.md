@@ -29,7 +29,7 @@
 - [x] Desktop screenshot: reward reveal
 - [x] Desktop screenshot: confirmed Claim receipt and Explorer link
 - [x] Mobile screenshot: final Share screen
-- [ ] 60-90 second demo video covering the complete loop
+- [x] 60-90 second demo video covering the complete loop
 - [ ] X post with `@injective`, `@NinjaLabsHQ`, `@NinjaLabsCN`, and `#InjectiveGlobalCupHackathon`
 
 ## P1 - Judge Clarity
