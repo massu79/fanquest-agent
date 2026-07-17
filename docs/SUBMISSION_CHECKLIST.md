@@ -16,10 +16,10 @@
 
 ## P0 - Publish
 
-- [ ] Create or confirm the public GitHub repository
+- [x] Create or confirm the public GitHub repository
 - [ ] Deploy the Next.js app
 - [ ] Set `NEXT_PUBLIC_DEMO_URL`
-- [ ] Set `NEXT_PUBLIC_GITHUB_URL`
+- [x] Set `NEXT_PUBLIC_GITHUB_URL`
 - [ ] Rebuild and verify the X post contains both real links
 - [ ] Verify `/`, `/dashboard`, `/demo`, `/docs`, and both API routes in production
 

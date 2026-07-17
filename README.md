@@ -184,7 +184,7 @@ The product journey, live World Cup feed, live Injective chain read, MetaMask in
 
 The remaining external submission gates are:
 
-- set the real public demo and GitHub URLs;
+- set the real public demo URL;
 - run one user-approved Claim transaction from a funded MetaMask testnet account;
 - capture a confirmed Explorer receipt screenshot and a short demo video;
 - deploy a funded reward contract only if actual `0.75 INJ` payout is required beyond the receipt proof.

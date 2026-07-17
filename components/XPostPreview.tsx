@@ -9,7 +9,7 @@ type XPostPreviewProps = {
 export function buildXPost(match: WorldCupMatch, entries: ScoredSubmission[]) {
   const leader = [...entries].sort((a, b) => b.points - a.points)[0]?.displayName ?? "the community";
   const demoUrl = process.env.NEXT_PUBLIC_DEMO_URL ?? "https://fanquest-agent.example/demo";
-  const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/your-org/fanquest-agent";
+  const githubUrl = process.env.NEXT_PUBLIC_GITHUB_URL ?? "https://github.com/massu79/fanquest-agent";
 
   return `Built FanQuest Agent for The Injective Global Cup: a World Cup fan engagement app that turns every match into a hype engine.
 
