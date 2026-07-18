@@ -1,0 +1,49 @@
+1
+00:00:00,000 --> 00:00:05,500
+FanQuest Agent turns every World Cup match
+into a guided fan journey.
+
+2
+00:00:05,500 --> 00:00:11,000
+Fans create an identity and connect an Injective testnet wallet,
+with a clear review fallback.
+
+3
+00:00:11,000 --> 00:00:17,000
+They pick a live match, join a quest, and lock winner,
+scoring team, and player predictions.
+
+4
+00:00:17,000 --> 00:00:22,500
+The result resolves in seconds,
+calculating points from match data.
+
+5
+00:00:22,500 --> 00:00:28,000
+An open-box reveal transforms the outcome
+into an emotional reward moment.
+
+6
+00:00:28,000 --> 00:00:34,000
+Points update the leaderboard,
+then the fan creates an on-chain claim receipt.
+
+7
+00:00:34,000 --> 00:00:40,000
+The wallet view separates confirmed proof
+from demo reward accounting.
+
+8
+00:00:40,000 --> 00:00:45,500
+A share-ready X post closes the loop:
+predict, compete, reveal, rank, and share.
+
+9
+00:00:45,500 --> 00:00:52,500
+The Injective EVM testnet transaction
+is publicly verifiable in Blockscout.
+
+10
+00:00:52,500 --> 00:00:59,500
+Status, block, gas, and the FanQuest claim memo
+make the journey provable end to end.

@@ -4,7 +4,7 @@
 
 **Live demo:** https://fanquest-agent.vercel.app/demo
 
-**63-second submission video:** [Watch the complete demo journey](docs/video/fanquest-agent-demo.webm)
+**60-second narrated submission video:** [MP4](docs/video/fanquest-agent-demo.mp4) | [WebM](docs/video/fanquest-agent-demo.webm) | [English captions](docs/video/fanquest-agent-demo.en.srt)
 
 FanQuest Agent turns a World Cup match into a guided fan loop:
 
