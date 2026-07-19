@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { ConfettiLayer } from "./ConfettiLayer";
 import { GlowBurst } from "./GlowBurst";
 import { GlowButton } from "./GlowButton";
@@ -33,6 +33,7 @@ function buildDemoXPost(points: number) {
 }
 
 export function DemoScript() {
+  const activeStepRef = useRef<HTMLDivElement>(null);
   const [feed, setFeed] = useState<WorldCupFeed>({ matches: fallbackDemoMatches, source: "deterministic fallback", sourceUrl: "", fetchedAt: new Date(0).toISOString(), live: false });
   const matches = feed.live ? pickDemoMatches(feed.matches) : fallbackDemoMatches;
   const [step, setStep] = useState(0);
@@ -111,6 +112,18 @@ export function DemoScript() {
       window.removeEventListener("ethereum#initialized", detectWallet);
     };
   }, []);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+      if (step === 0) {
+        window.scrollTo({ top: 0, behavior });
+      } else {
+        activeStepRef.current?.scrollIntoView({ behavior, block: "start" });
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [step]);
 
   async function connectWallet() {
     setWalletBusy(true);
@@ -240,7 +253,7 @@ export function DemoScript() {
       <div className="flex items-start gap-1">{stepLabels.map((label, index) => <div key={label} className="flex min-w-0 flex-1 flex-col items-center gap-2"><div className={`h-1.5 w-full rounded-full ${index <= step ? "bg-gradient-to-r from-cyan-300 to-fuchsia-500" : "bg-white/10"}`} /><span className={`hidden text-center text-[10px] font-bold lg:block ${index === step ? "text-white" : "text-slate-500"}`}>{label}</span><span className={`text-[10px] font-black lg:hidden ${index === step ? "text-cyan-200" : "text-slate-600"}`}>{index + 1}</span></div>)}</div>
     </section>
 
-    <div key={step} className="demo-step-enter mt-6">
+    <div ref={activeStepRef} key={step} className="demo-step-enter mt-6 scroll-mt-48">
       {step === 0 && <DemoPanel eyebrow="Step 1 / Create Account" title="Your fan identity starts here" description="Use a demo Google identity to create your FanQuest profile. No real Google data is requested.">
         <div className="mx-auto max-w-md rounded-lg border border-white/10 bg-black/30 p-5"><div className="flex items-center gap-4"><span className="grid h-12 w-12 place-items-center rounded-full bg-white text-xl font-black text-blue-600">G</span><div><p className="font-black text-white">Google demo account</p><p className="text-sm text-slate-400">aiko.demo@example.com</p></div></div><label className="mt-5 block"><span className="text-sm font-bold text-slate-200">Fan display name</span><input className="focus-ring mt-2 w-full rounded border border-white/15 bg-slate-950 px-4 py-3 text-white" value={displayName} onChange={(event) => setDisplayName(event.target.value)} maxLength={20} /></label></div>
         <PrimaryAction disabled={!displayName.trim()} onClick={() => setStep(1)}>Continue with Google</PrimaryAction>
